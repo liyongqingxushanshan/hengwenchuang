@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>用户登录</title>
+    <link rel="stylesheet" type="text/css" href="media/layui/css/layui.css" />
+    <link rel="stylesheet" type="text/css" href="media/css/login2.css" />
+    <script type="text/javascript" src="media/js/jquery.min.js"></script>
+    <script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+    <script type="text/javascript">
+
+        function login(obj) {
+            $.post("userLogin.do", "username=" + obj.account + "&password=" + obj.password, function(data) {
+                if (data.code == 0) {
+                    if (data.data == 1) {
+                        location.href = "index.html";
+                    }else {
+                        location.href = "admin.html";
+                    }
+                } else {
+                    layer.open({
+                        title : '提示',
+                        content : data.msg
+                    });
+                }
+            });
+
+        }
+    </script>
+</head>
+
+<body>
+<div class="m-login-bg">
+    <div class="m-login">
+        <h3>用户登录</h3>
+        <div class="m-login-warp">
+            <form class="layui-form">
+                <input type="hidden" name="ip" id="ip1"/>
+                <input type="hidden" name="city" id="cy1"/>
+                <div class="layui-form-item">
+                    <input type="text" name="account" required lay-verify="account"
+                           placeholder="账号" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-item">
+                    <input type="password" name="password" required lay-verify="password"
+                           placeholder="密码" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-item m-login-btn">
+                    <div class="layui-inline">
+                        <button class="layui-btn layui-btn-normal" lay-submit
+                                lay-filter="login">登录</button>
+                    </div>
+                    <div class="layui-inline">
+                        <a class="layui-btn layui-btn-primary" style="width: 170px" href="register.html">注册</a>
+                        <!--<button class="layui-btn layui-btn-primary"><a href="register.html">注册</a></button>-->
+                    </div>
+                </div>
+            </form>
+        </div>
+        <p class="copyright">Copyright 2015-2018 by wenchuang</p>
+    </div>
+</div>
+<script src="media/layui/layui.js" type="text/javascript"
+        charset="utf-8"></script>
+<script>
+    layui.use([ 'form' ], function() {
+        var form = layui.form;
+
+        //自定义验证规则
+        form.verify({
+            account : function(value) {
+                if (value.length == 0) {
+                    return '账号不能为空';
+                }
+            },
+            password : [ /(.+){6,12}$/, '密码必须6到12位' ],
+            verity : [ /(.+){4}$/, '验证码必须是4位' ],
+
+        });
+
+        //监听提交
+        form.on('submit(login)', function(data) {
+
+            /* layer.alert(JSON.stringify(data.field), {
+                title : '最终的提交信息'
+            }) */
+            var obj = data.field;
+            login(obj);
+
+            return false;
+        });
+
+    });
+</script>
+</body>
+
+</html>

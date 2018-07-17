@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--约束文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--该映射文件对应的接口 -->
+<mapper namespace="com.qfedu.dao.ShiTiMapper">
+
+    <select id="queryAll" resultType="com.qfedu.domain.ShiTi">
+		select * from t_shiti limit #{index},#{count};
+	</select>
+    <insert id="insert" parameterType="com.qfedu.domain.ShiTi">
+		insert into t_shiti (timu, daan)
+		values (#{timu},#{daan});
+	</insert>
+
+    <select id="queryCount" resultType="java.lang.Integer">
+		select count(*) from t_shiti;
+	</select>
+
+    <delete id="deteleById">
+		delete from t_shiti where id = #{id};
+	</delete>
+
+    <update id="updataById" parameterType="com.qfedu.domain.ShiTi">
+		update t_shiti set timu = #{timu},daan = #{daan} where id = #{id};
+	</update>
+    <select id="queryList" resultType="com.qfedu.domain.ShiTi">
+		select * from t_shiti order by rand() limit 0,10;
+	</select>
+
+    <select id="queryShiti" resultType="com.qfedu.domain.ShiTi">
+		select * from t_shiti where id = #{id} and daan=#{daan};
+	</select>
+</mapper>

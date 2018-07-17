@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>试题管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="media/layui/css/layui.css" media="all">
+    <script src="media/js/jquery.min.js"></script>
+</head>
+<body>
+<div>
+
+    <div style="margin-top: 20px;margin-left: 20px">
+        <button class="layui-btn" lay-submit lay-filter="formDemo">添加试题</button>
+    </div>
+
+    <table id="tbdata" lay-filter="tbop"></table>
+    <script type="text/html" id="barop">
+        <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+    </script>
+</div>
+
+<script src="media/layui/layui.js"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    var tableIns;
+    layui.use(['form', 'table'], function () {
+        var table = layui.table;
+        var form = layui.form;
+        //第一个实例
+        tableIns = table.render({
+            elem: '#tbdata'
+            , url: 'allShiTi.do' //数据接口
+            , page: true //开启分页
+            , cols: [[ //表头
+                {field: 'id', title: '题号', sort: true, fixed: 'left'}
+                , {field: 'td', title: '试题'}
+                , {field: 'right', title: '操作', toolbar: "#barop"}
+            ]]
+        });
+        //监听工具条
+        table.on('tool(tbop)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('是否确认删除?', function (index) {
+                    $.ajax({
+                        url: "shitidelete.do",
+                        type: "POST",
+                        data: "id=" + data.id,
+                        success: function (data) {
+                            if (data.code == 0) {
+                                obj.del();//删除表格中的对应行数据
+                                layer.close(index);
+                                layer.msg("删除成功", {icon: 6});
+                            } else {
+                                layer.msg("删除失败", {icon: 5});
+                            }
+                        }
+                    });
+                });
+            } else if (obj.event === 'edit') {//编辑 修改
+                loadShiti(data)
+            }
+        });
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            addShiti(data.field)
+        });
+    });
+    function searchData() {
+        tableIns.reload({
+             page: {
+                curr: 1 //重新从第 1 页开始
+            }
+        });
+    }
+    function addShiti(shiti) {
+        $("#uid").val("");
+        $("#timu").val("");
+        $("#daan").val("");
+        console.log(shiti)
+        layer.open({
+            area: ['500px', '300px'],
+            title: '试题新增',
+            type: 1,
+            content: $('#dvlay'), //这里content是一个普通的String
+            btn: ['确认', '取消'],
+            yes: function (index, layero) {
+                $.ajax({
+                    url: "shitiadd.do",
+                    data: $("#fm1").serialize(),
+                    success: function (obj) {
+                        if (obj.code == 0) {
+                            layer.msg("新增成功");
+                            searchData();
+                        } else {
+                            layer.msg("新增失败");
+                        }
+                    }
+                })
+                layer.close(index);
+            }, cancel: function () {
+            }
+        });
+    }
+
+    function loadShiti(shiti) {
+        console.log(shiti)
+        $("#uid").val(shiti.id);
+        $("#timu").val(shiti.timu);
+        $("#daan").val(shiti.daan);
+        layer.open({
+            area: ['500px', '300px'],
+            title: '试题编辑',
+            type: 1,
+            content: $('#dvlay'), //这里content是一个普通的String
+            btn: ['确认', '取消'],
+            yes: function (index, layero) {
+                $.ajax({
+                    url: "shitiedit.do",
+                    data: $("#fm1").serialize(),
+                    success: function (obj) {
+                        if (obj.code == 0) {
+                            layer.msg("编辑成功");
+                            searchData();
+                        } else {
+                            layer.msg("编辑失败");
+                        }
+                    }
+                })
+                layer.close(index);
+            }, cancel: function () {
+            }
+        });
+    }
+</script>
+</body>
+<div style="display: none;margin-top: 10px;width: 480px" id="dvlay">
+    <form id="fm1" class="layui-form layui-form-pane">
+        <input id="uid" name="id" hidden value="">
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">试题：</label>
+            <div class="layui-input-inline">
+                <input id="timu" name="timu" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">答案：</label>
+            <div class="layui-input-inline">
+                <input id="daan" name="daan" class="layui-input">
+            </div>
+        </div>
+    </form>
+</div>
+</html>

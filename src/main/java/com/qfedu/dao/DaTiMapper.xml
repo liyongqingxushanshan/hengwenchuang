@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--约束文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--该映射文件对应的接口 -->
+<mapper namespace="com.qfedu.dao.DaTiMapper">
+
+    <select id="queryAll" resultType="com.qfedu.domain.DaTi">
+		SELECT st.timu,dt.dati,dt.flag FROM t_dati dt left JOIN t_shiti st on dt.sid = st.id left JOIN t_ceshi cs on dt.sid = cs.id  where dt.csid = #{csid};
+	</select>
+    <insert id="insert" parameterType="com.qfedu.domain.DaTi">
+		insert into t_dati (sid, flag,csid,dati)
+		values (#{sid},#{flag},#{csid},#{dati});
+	</insert>
+	<select id="queryAll2" resultType="com.qfedu.domain.DaTi">
+		SELECT * from t_dati  where flag = 1 and csid = #{csid};
+	</select>
+</mapper>

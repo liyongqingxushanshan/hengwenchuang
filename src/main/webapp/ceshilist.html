@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>试题管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="media/layui/css/layui.css" media="all">
+    <script src="media/js/jquery.min.js"></script>
+</head>
+<body>
+<div>
+    <table id="tbdata" lay-filter="tbop"></table>
+    <script type="text/html" id="barop">
+        <a class="layui-btn layui-btn-mini" lay-event="edit">查看</a>
+        <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+    </script>
+</div>
+<script src="media/layui/layui.js"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.use('table', function () {
+        var table = layui.table;
+        //第一个实例
+        table.render({
+            elem: '#tbdata'
+            , url: 'allceshi.do' //数据接口
+            , page: true //开启分页
+            , cols: [[ //表头
+                {field: 'id', title: '序号', sort: true, fixed: 'left'}
+                , {field: 'username', title: '姓名'}
+                , {field: 'datatime', title: '时间'}
+                , {field: 'score', title: '分数'}
+                , {field: 'right', title: '操作', toolbar: "#barop"}
+            ]]
+        });
+        //监听工具条
+        table.on('tool(tbop)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('是否确认删除?', function (index) {
+                    $.ajax({
+                        url: "ceshidelete.do",
+                        type: "POST",
+                        data: "id=" + data.id,
+                        success: function (data) {
+                            if (data.code == 0) {
+                                obj.del();//删除表格中的对应行数据
+                                layer.close(index);
+                                layer.msg("删除成功", {icon: 6});
+                            } else {
+                                layer.msg("删除失败", {icon: 5});
+                            }
+                        }
+                    });
+                });
+            } else if (obj.event === 'edit') {//编辑 修改
+                loadRoles(data)
+            }
+        });
+    });
+
+    function loadRoles(data) {
+        $("#score").val(data.score + "分");
+        $.get("alldati.do", "csid=" + data.id, function (arr) {
+            $("#dv1").html("");
+            for (var i = 0; i < arr.length; i++) {
+                var flag="\t错";
+                if (arr[i].flag == 1) {
+                    flag="\t对";
+                    $("#dv1").append("<div class=\"layui-input-inline\">"+arr[i].shiti + flag+"</div>");
+
+                } else {
+                    $("#dv1").append("<div class=\"layui-input-inline\" style=\"color: red\">"+arr[i].shiti + flag+"</div>");
+                }
+
+            }
+            layer.open({
+                area: ['500px', '400px'],
+                title: '测验结果',
+                type: 1,
+                content: $('#dvlay'), //这里content是一个普通的String
+                btn: ['取消'],
+                cancel: function () {
+                }
+            });
+        })
+    }
+</script>
+</body>
+<div style="display: none;margin-top: 10px;width: 480px;height: 500px" id="dvlay">
+    <form id="fm1" class="layui-form layui-form-pane">
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">测验详情</label>
+            <div class="layui-input-inline" id="dv1">
+
+            </div>
+        </div>
+        <div class="layui-form-item" pane>
+            <label class="layui-form-label">总分</label>
+            <div class="layui-input-inline">
+                <div class="layui-input-inline">
+                    <input id="score" name="score" readonly class="layui-input">
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+</html>

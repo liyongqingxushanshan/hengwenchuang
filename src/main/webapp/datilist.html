@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>试题管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="media/layui/css/layui.css" media="all">
+    <script src="media/js/jquery.min.js"></script>
+</head>
+<body>
+<div>
+
+    <form id="fm1" class="layui-form layui-form-pane" >
+        <div>一年级算术题测验</div>
+        <div class="layui-form-item">
+            <div class="layui-input-inline" id="dv1">
+
+            </div>
+        </div>
+        <div class="layui-form-item m-login-btn">
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-normal" lay-submit
+                        lay-filter="login">交卷
+                </button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script src="media/layui/layui.js"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    $(function () {
+        $.get("queryList.do", null, function (arr) {
+            $("#dv1").html("");
+            for (var i = 0; i < arr.length; i++) {
+                $("#dv1").append("<input id=\"id\" name=\"id\" hidden value=\""+arr[i].id+"\">\n" +
+                    "                <label class=\"layui-form-label\">"+arr[i].timu+"</label>\n" +
+                    "                <div class=\"layui-input-block\">\n" +
+                    "                    <input id=\"daan\" name=\"daan\" class=\"layui-input\">\n" +
+                    "                </div>");
+            }
+        });
+    })
+    layui.use(['form'], function () {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(login)', function (data) {
+            commit()
+            return false;
+        });
+    });
+    function commit() {
+
+        layer.open({
+            area: ['300px', '150px'],
+            title: '提示',
+            type: 1,
+            content: "确定交卷吗？",
+            btn: ['确认', '取消'],
+            yes: function(index, layero){
+                $.ajax({
+                    url: "addceshi.do",
+                    data: $("#fm1").serialize(),
+                    success: function (obj) {
+                        if (obj.code == 0) {
+                            layer.msg("成功");
+                            location.href = "tiaozhuan.html";
+                        } else {
+                            layer.msg("失败");
+                        }
+                    }
+                })
+                layer.close(index);
+            },cancel: function(){
+            }
+        });
+    }
+</script>
+</body>
+</html>

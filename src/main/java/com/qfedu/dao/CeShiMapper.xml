@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--约束文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--该映射文件对应的接口 -->
+<mapper namespace="com.qfedu.dao.CeShiMapper">
+
+    <select id="queryAll" resultType="com.qfedu.domain.CeShi">
+		SELECT * from t_ceshi order by datatime desc limit #{index},#{count};
+	</select>
+    <insert id="insert" parameterType="com.qfedu.domain.CeShi" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into t_ceshi (uid, username,datatime)
+		values (#{uid},#{username},now());
+	</insert>
+	<select id="queryCount" resultType="java.lang.Integer">
+		select count(*) from t_ceshi;
+	</select>
+	<delete id="deteleById">
+		delete from t_ceshi where id = #{id};
+	</delete>
+
+</mapper>
